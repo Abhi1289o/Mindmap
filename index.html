@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PenStrike - Archery</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #87CEEB;
+            /* Sky blue */
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ui">Score: <span id="score">0</span></div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+
+        // Setup canvas size
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Game state
+        let score = 0;
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        let isShooting = false;
+        const holes = [];
+
+        // Target settings
+        const target = {
+            x: canvas.width / 2,
+            y: canvas.height / 2 + 50,
+            radius: 80,
+            colors: ['white', 'black', '#00bfff', 'red', 'yellow']
+        };
+
+        // Track mouse
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Shoot on click
+        window.addEventListener('mousedown', (e) => {
+            isShooting = true;
+
+            // Record hole
+            holes.push({ x: mouseX, y: mouseY, life: 100 });
+
+            // Check hit distance from center of target
+            const dist = Math.hypot(mouseX - target.x, mouseY - target.y);
+
+            // Calculate score based on rings
+            if (dist < target.radius) {
+                const ringWidth = target.radius / 5;
+                const hitRing = Math.floor(dist / ringWidth);
+                const points = (5 - hitRing) * 10;
+                score += points;
+                scoreEl.innerText = score;
+            }
+
+            setTimeout(() => isShooting = false, 100);
+        });
+
+        // Main game loop
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw greenery background (ground)
+            ctx.fillStyle = '#2E8B57'; // SeaGreen
+            ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
+
+            // Draw target
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, target.radius - (i * target.radius / 5), 0, Math.PI * 2);
+                ctx.fillStyle = target.colors[i];
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            // Draw Target Stand
+            ctx.fillStyle = '#8B4513'; // SaddleBrown
+            ctx.fillRect(target.x - 5, target.y + target.radius, 10, canvas.height - (target.y + target.radius));
+
+            // Draw holes
+            for (let i = holes.length - 1; i >= 0; i--) {
+                const h = holes[i];
+                ctx.beginPath();
+                ctx.arc(h.x, h.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fill();
+            }
+
+            // Draw crosshair/gun POV
+            drawCrosshair(mouseX, mouseY);
+
+            requestAnimationFrame(draw);
+        }
+
+        function drawCrosshair(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Recoil effect
+            const offset = isShooting ? 10 : 0;
+
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+
+            // Circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 15 + offset, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Lines
+            ctx.beginPath();
+            // Top
+            ctx.moveTo(0, -5 - offset);
+            ctx.lineTo(0, -25 - offset);
+            // Bottom
+            ctx.moveTo(0, 5 + offset);
+            ctx.lineTo(0, 25 + offset);
+            // Left
+            ctx.moveTo(-5 - offset, 0);
+            ctx.lineTo(-25 - offset, 0);
+            // Right
+            ctx.moveTo(5 + offset, 0);
+            ctx.lineTo(25 + offset, 0);
+            ctx.stroke();
+
+            // Center dot
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+
+            // Gun barrel simulation from bottom of screen to crosshair
+            ctx.restore();
+
+            // Draw gun barrel
+            ctx.save();
+            const gunBaseX = canvas.width / 2;
+            const gunBaseY = canvas.height;
+
+            // Calculate angle
+            const angle = Math.atan2(y - gunBaseY, x - gunBaseX);
+
+            ctx.translate(gunBaseX, gunBaseY);
+            ctx.rotate(angle + Math.PI / 2); // Adjust rotation to point up relative to angle
+
+            // Dynamic recoil
+            const recoilY = isShooting ? 20 : 0;
+
+            // Draw simple gun model
+            ctx.fillStyle = '#333';
+            ctx.fillRect(-15, -150 + recoilY, 30, 200); // Barrel
+            ctx.fillStyle = '#111';
+            ctx.fillRect(-20, -10 + recoilY, 40, 50); // Base/Handle area
+
+            ctx.restore();
+        }
+
+        // Initialize target to adjust for responsive resize
+        target.x = canvas.width / 2;
+        target.y = canvas.height / 2;
+
+        // Start loop
+        draw();
+    </script>
+</body>
+
+</html>
