@@ -1,0 +1,184 @@
+/* src/styles/login.css */
+
+/* --- GENERAL RESET --- */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+/* --- BACKGROUND --- */
+.background {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(-45deg, #e58346, #3e7f32, #2b8fa1, #3b82f6);
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+
+/* --- LOGIN CARD --- */
+.login-card {
+  width: 400px;
+  padding: 50px;
+  border-radius: 15px;
+  backdrop-filter: blur(15px);
+  background: #1e1b4b;   /* fixed card color */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  color: white;
+  text-align: center;
+  position: relative; /* required for z-index */
+  z-index: 1;         /* above strips */
+}
+
+.title {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  margin-bottom: 30px;
+  opacity: 0.8;
+}
+
+/* --- LOGIN FORM --- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #666;
+  transition: 0.3s;
+  pointer-events: none;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 10px;
+  font-size: 12px;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.password {
+  position: relative;
+}
+
+.toggle {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  cursor: pointer;
+  color: #555;
+}
+
+.login-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #6366f1;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+
+/* Base strip */
+.strip {
+  position: absolute;
+  width: 8px;
+  height: 420px;
+  border-radius: 20px;
+  background: #1e1b4b ;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+  opacity: 0.8;
+  z-index: 0;
+  transform: translateY(600px); /* start offscreen */
+  transition: transform 1s ease, opacity 1s ease;
+}
+
+/* LEFT STRIPS */
+.strip-l1 { left: calc(50% - 230px); }
+.strip-l2 { left: calc(50% - 300px); }
+.strip-l3 { left: calc(50% - 370px); }
+.strip-l4 { left: calc(50% - 450px); }
+.strip-l5 { left: calc(50% - 540px); }
+
+/* RIGHT STRIPS */
+.strip-r1 { right: calc(50% - 230px); }
+.strip-r2 { right: calc(50% - 300px); }
+.strip-r3 { right: calc(50% - 370px); }
+.strip-r4 { right: calc(50% - 450px); }
+.strip-r5 { right: calc(50% - 540px); }
+
+/* Apply stagger using CSS variable */
+.strip.rise {
+  opacity: 0.8;
+  transform: translateY(0);
+  transition: transform 1s ease, opacity 1s ease;
+  transition-delay: calc(var(--i) * 0.08s); /* staggered delay */
+}
+
+.strip.fall {
+  transform: translateY(800px);
+  opacity: 0;
+  transition: transform 1.2s ease-in, opacity 1.2s ease-in;
+  transition-delay: calc(var(--i) * 0.1s); /* optional stagger on fall */
+}
+
+.strip.reset {
+  transform: translateY(0);
+  opacity: 0.8;
+  transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+  transition-delay: calc(var(--i) * 0.1s); /* stagger back */
+}
+
+/* Assign --i from data-index using JS */
+
+/* Shake animation for strips */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+.strip.shake {
+  animation: shake 0.5s ease-in-out;
+}
