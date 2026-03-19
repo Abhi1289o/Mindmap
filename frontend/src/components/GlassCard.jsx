@@ -1,27 +1,36 @@
 import { useEffect, useRef } from "react";
 import "../styles/glasscard.css";
 
-export default function GlassCard({ id, defaultContent }) {
+export default function GlassCard({ card_id }) {
   const cardRef = useRef(null);
 
-  // Load saved content once
+  // Fetch card content once
   useEffect(() => {
-    const saved = localStorage.getItem(id);
-    if (saved && cardRef.current) {
-      cardRef.current.innerHTML = saved;
-    } else if (cardRef.current) {
-      cardRef.current.innerHTML = defaultContent;
-    }
-  }, [id, defaultContent]);
+    if (!card_id) return;
 
-  // Save function (can be replaced with PostgreSQL call later)
+    const fetchCard = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/cards/${card_id}`);
+        if (!res.ok) throw new Error("Failed to fetch card");
+        const data = await res.json();
+
+        if (cardRef.current) {
+          cardRef.current.innerHTML = `<h1>${data.title || "Untitled"}</h1><p>${data.content || ""}</p>`;
+        }
+      } catch (err) {
+        console.error(err);
+        if (cardRef.current) {
+          cardRef.current.innerHTML = "<h1>Error loading card</h1>";
+        }
+      }
+    };
+
+    fetchCard();
+  }, [card_id]);
+
+  // save to backend later
   const handleSave = () => {
-    if (cardRef.current) {
-      const content = cardRef.current.innerHTML;
-      localStorage.setItem(id, content); // temporary storage
-      alert("Card saved!"); // optional feedback
-      console.log("Saved content:", content); // you can send this to backend
-    }
+    return;
   };
 
   return (
@@ -36,6 +45,7 @@ export default function GlassCard({ id, defaultContent }) {
         className="glass-card"
         contentEditable
         ref={cardRef}
+        suppressContentEditableWarning={true} // suppress React warning
       />
     </div>
   );

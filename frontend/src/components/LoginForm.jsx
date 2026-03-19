@@ -15,23 +15,30 @@ export default function LoginForm({ onLoginResult }) {
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password }) // keep username for backend
       });
 
       const data = await response.json();
       setLoading(false);
       console.log(data);
+
       if (data.success) {
-        // Notify parent that login succeeded
-        onLoginResult(true);
+        // Pass the full user info to parent
+        onLoginResult({
+          success: true,
+          user: {
+            user_id: data.user_id,
+            name: data.name,
+            root_card_id: data.root_card_id
+          }
+        });
       } else {
-        // Login failed
-        onLoginResult(false);
+        onLoginResult({ success: false });
       }
 
     } catch (err) {
       setLoading(false);
-      onLoginResult(false);
+      onLoginResult({ success: false });
     }
   };
 

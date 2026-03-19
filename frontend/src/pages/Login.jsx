@@ -25,15 +25,18 @@ export default function Login() {
   }, []);
 
   // Handle login result from LoginForm
-  const handleLoginResult = (success) => {
-    if (success) {
-      setLoginStatus("success"); // trigger fall
+  const handleLoginResult = (result) => {
+    if (loginStatus === "success") return;
+    console.log("loging:", result);
+    if (result.success) {
+      setLoginStatus("success"); // trigger fall animation
       setTimeout(() => {
-        navigate("/header"); // redirect using react-router
-      }, 1300); // match animation duration
+        // You can pass user info via state or context if needed
+        navigate("/header", { state: { root_card_id: result.user.root_card_id } });
+      }, 1300); 
     } else {
       setShake(true); // trigger shake animation
-      setTimeout(() => setShake(false), 500); // reset shake so it can replay next time
+      setTimeout(() => setShake(false), 500); 
     }
   };
 
@@ -47,19 +50,15 @@ export default function Login() {
   return (
     <div className="background">
       {/* LEFT STRIPS */}
-      <div className={`strip strip-l1 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="1"></div>
-      <div className={`strip strip-l2 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="2"></div>
-      <div className={`strip strip-l3 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="3"></div>
-      <div className={`strip strip-l4 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="4"></div>
-      <div className={`strip strip-l5 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="5"></div>
+      {["l1","l2","l3","l4","l5"].map((cls,i) => (
+        <div key={cls} className={`strip strip-${cls} ${getStripClass()} ${shake ? "shake" : ""}`} data-index={i+1}></div>
+      ))}
 
       {/* RIGHT STRIPS */}
-      <div className={`strip strip-r1 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="1"></div>
-      <div className={`strip strip-r2 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="2"></div>
-      <div className={`strip strip-r3 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="3"></div>
-      <div className={`strip strip-r4 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="4"></div>
-      <div className={`strip strip-r5 ${getStripClass()} ${shake ? "shake" : ""}`} data-index="5"></div>
-
+      {["r1","r2","r3","r4","r5"].map((cls,i) => (
+        <div key={cls} className={`strip strip-${cls} ${getStripClass()} ${shake ? "shake" : ""}`} data-index={i+1}></div>
+      ))}
+      
       {/* Login Card */}
       <div className="login-card">
         <h1 className="title">MindMap</h1>
