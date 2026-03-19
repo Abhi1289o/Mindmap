@@ -1,17 +1,18 @@
 // src/pages/Header.jsx
+import GlassCard from "../components/GlassCard";
+import "../styles/global.css";
+
 export default function Header() {
   return (
-    <div style={{ 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
-      height: "100vh", 
-      backgroundColor: "#1e1b4b", 
-      color: "white",
-      flexDirection: "column"
-    }}>
-      <h1>Welcome to MindMap!</h1>
-      <p>You have successfully logged in.</p>
+    <div className="page-container">
+      <GlassCard
+        id="main-card2"
+        defaultContent={`
+          <h1>Welcome to MindMap!</h1>
+          <p>You have successfully logged in.</p>
+          <p>Edit this dashboard card...</p>
+        `}
+      />
     </div>
   );
 }
