@@ -58,6 +58,34 @@ app.get('/cards/:cardId', async (req, res) => {
   });
 });
 
+app.put('/cards/:cardId', async (req, res) => {
+  const cardId = req.params.cardId;
+  const { title, content } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE cards 
+       SET title = $1, card_content = $2 
+       WHERE card_id = $3 
+       RETURNING *`,
+      [title, content, cardId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Card not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Card saved successfully",
+      card: result.rows[0]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 app.listen(5000, () => {
     console.log('server is running...');
 });
