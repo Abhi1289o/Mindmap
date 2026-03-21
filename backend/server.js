@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
+const { v4: uuidv4 } = require('uuid');
+const { link } = require("fs");
 
 app = express();
 
@@ -83,6 +85,48 @@ app.put('/cards/:cardId', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+app.post("/cards/createcard", async (req, res) => {
+  const { user_id, source_card_id } = req.body; // source_card_id = current card where link is created
+
+  try {
+    // 1️⃣ Create the new card
+    const cardResult = await pool.query(
+      `INSERT INTO cards (user_id, title, card_content)
+       VALUES ($1, $2, $3)
+       RETURNING card_id`,
+      [user_id, "Untitled", "Start writing..."]
+    );
+
+    const newCardId = cardResult.rows[0].card_id;
+
+    let linkId = uuidv4();
+
+    // 2️⃣ Create link tuple if source_card_id is provided
+    if (source_card_id) {
+      const linkResult = await pool.query(
+        `INSERT INTO link_cards (link_id, card_id, ref_card_id)
+         VALUES ($3, $1, $2)
+         RETURNING link_id`,
+        [source_card_id, newCardId, linkId]
+      );
+    }
+
+    // 3️⃣ Return both card_id and link_id
+    res.json({
+      success: true,
+      card_id: newCardId,
+      link_id: linkId, // null if no source_card_id provided
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create card and link"
+    });
   }
 });
 

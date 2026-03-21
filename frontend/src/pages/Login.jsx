@@ -27,12 +27,12 @@ export default function Login() {
   // Handle login result from LoginForm
   const handleLoginResult = (result) => {
     if (loginStatus === "success") return;
-    console.log("loging:", result);
+    
     if (result.success) {
       setLoginStatus("success"); // trigger fall animation
       setTimeout(() => {
         // You can pass user info via state or context if needed
-        navigate("/header", { state: { root_card_id: result.user.root_card_id } });
+        navigate("/header", { state: { root_card_id: result.user.root_card_id, user_id: result.user.user_id } });
       }, 1300); 
     } else {
       setShake(true); // trigger shake animation
