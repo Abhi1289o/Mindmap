@@ -71,7 +71,7 @@
 }
 
 /* Save button on top-right corner */
-.save-button {
+.save-button, .create-button, .back-button {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -87,38 +87,31 @@
   animation: fadeIn 0.6s ease;
 }
 
-.save-button:hover {
+.save-button:hover, .create-button:hover, .back-button {
   background-color: rgba(255, 255, 255, 0.25);
 }
 
 .create-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10;
-  padding: 8px 16px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  
-  animation: fadeIn 0.6s ease;
-}
-
-.create-button:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  margin-left: auto;
 }
 
 .button-group {
   position: absolute;
   top: 20px;
+  left: 20px;
   right: 20px;
   display: flex;
-  gap: 10px; /* space between buttons */
+  align-items: center;
+  gap: 10px;
 }
 
-.save-button, .create-button {
+.save-button, .create-button, .back-button {
   position: static; /* remove absolute inside the flex container */
+}
+
+h1 {
+  text-align: center;      /* center horizontally */
+  word-wrap: break-word;   /* allow long words to wrap */
+  overflow-wrap: break-word; /* modern equivalent */
+  white-space: normal;     /* ensure wrapping is allowed */
 }

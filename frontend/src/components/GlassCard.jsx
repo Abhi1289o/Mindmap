@@ -125,6 +125,10 @@ export default function GlassCard({ card_id: initialCardId, user_id }) {
     }
   };
 
+  const handleBack = () => {
+    return;
+  }
+
   return (
     <div className="glass-card-container">
       {/* Notification */}
@@ -148,6 +152,10 @@ export default function GlassCard({ card_id: initialCardId, user_id }) {
 
       {/* Buttons */}
       <div className="button-group">
+        <button className="back-button" onClick={handleBack}>
+          ↑ Back
+        </button>
+        <div></div>
         <button className="create-button" onClick={handleCreateLink}>
           Create Link
         </button>
