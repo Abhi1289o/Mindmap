@@ -130,6 +130,39 @@ app.post("/cards/createcard", async (req, res) => {
   }
 });
 
+app.get("/cards/parent/:cardId", async (req, res) => {
+  const { cardId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT card_id 
+       FROM link_cards 
+       WHERE ref_card_id = $1`,
+      [cardId]
+    );
+
+    // If no linked card found → return same cardId
+    if (result.rows.length === 0) {
+      return res.json({
+        success: true,
+        card_id: cardId
+      });
+    }
+
+    res.json({
+      success: true,
+      card_id: result.rows[0].card_id
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
 app.listen(5000, () => {
     console.log('server is running...');
 });

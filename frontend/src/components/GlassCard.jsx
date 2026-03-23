@@ -125,9 +125,25 @@ export default function GlassCard({ card_id: initialCardId, user_id }) {
     }
   };
 
-  const handleBack = () => {
-    return;
-  }
+  const handleBack = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/cards/parent/${card_id}`);
+      if (!res.ok) throw new Error("Failed to fetch parent card");
+
+      const data = await res.json();
+
+      // If backend returns a valid parent card_id
+      if (data.card_id) {
+        setCardId(data.card_id);
+        fetchCard(data.card_id);
+      } else {
+        showNotification("No parent found", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification("Error going back", "error");
+    }
+  };
 
   return (
     <div className="glass-card-container">
