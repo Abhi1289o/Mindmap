@@ -145,6 +145,54 @@ export default function GlassCard({ card_id: initialCardId, user_id }) {
     }
   };
 
+  // Handle Enter key → insert <br> instead of <div>
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // prevent default div insertion
+
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+
+      const range = selection.getRangeAt(0);
+
+      // Create a <br> node
+      const br = document.createElement("br");
+      range.insertNode(br);
+
+      // Create a temporary text node to hold the cursor
+      const textNode = document.createTextNode("\u200B"); // zero-width space
+      range.insertNode(textNode);
+
+      // Move cursor inside the new text node
+      range.setStart(textNode, 1);
+      range.setEnd(textNode, 1);
+
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      range.setStartAfter(br);
+    }
+  };
+
+  // Handle paste → plain text only
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(document.createTextNode(text));
+
+    // Move cursor to end
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
+
   return (
     <div className="glass-card-container">
       {/* Notification */}
@@ -186,7 +234,10 @@ export default function GlassCard({ card_id: initialCardId, user_id }) {
         contentEditable
         ref={cardRef}
         suppressContentEditableWarning={true}
-        onClick={handleLinkClick} // handle internal link clicks
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        onClick={handleLinkClick}
+        data-placeholder="Start writing..."
       />
     </div>
   );
